@@ -44,11 +44,11 @@ class BytesWritable(WritableComparable):
         self._bytes = ''
 
     def write(self, data_output):
-        writeVInt(data_output, self._length)
+        data_output.writeInt(self._length)
         data_output.write(self._bytes)
 
     def readFields(self, data_input):
-        self._length = readVInt(data_input)
+        self._length = data_input.readInt()
         self._bytes = data_input.read(self._length)
 
     def equal(self, other):
