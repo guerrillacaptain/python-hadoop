@@ -27,6 +27,7 @@ import SetFile
 from Writable import *
 from IntWritable import *
 from Text import *
+from BytesWritable import *
 import WritableUtils
 
 import compress
