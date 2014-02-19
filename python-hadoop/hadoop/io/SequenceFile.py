@@ -27,7 +27,7 @@ from compress import CodecPool
 
 from WritableUtils import readVInt, writeVInt
 from Writable import Writable
-from OutputStream import FileOutputStream, DataOutputStream, DataOutputBuffer
+from OutputStream import FileOutputStream, FilelikeOutputStream, DataOutputStream, DataOutputBuffer
 from InputStream import FileInputStream, DataInputStream, DataInputBuffer
 from VersionMismatchException import VersionMismatchException, VersionPrefixException
 
@@ -122,7 +122,8 @@ class Writer(object):
     COMPRESSION_BLOCK_SIZE = 1000000
 
     def __init__(self, path, key_class, value_class, metadata, compress=False, block_compress=False):
-        if os.path.exists(path):
+        filelike = path.startswith('/dev/std')
+        if not filelike and os.path.exists(path):
             raise IOError("File %s already exists." % path)
 
         self._key_class = key_class
@@ -142,7 +143,8 @@ class Writer(object):
         self._last_sync = 0
         self._block = None
 
-        self._stream = DataOutputStream(FileOutputStream(path))
+        stream = FilelikeOutputStream(path) if filelike else FileOutputStream(path)
+        self._stream = DataOutputStream(stream)
 
         # sync is 16 random bytes
         self._sync = md5('%s@%d' % (uuid1().bytes, int(time() * 1000))).digest()

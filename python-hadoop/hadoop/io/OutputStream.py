@@ -53,6 +53,33 @@ class FileOutputStream(OutputStream):
     def write(self, value):
         return self._fd.write(value)
 
+class FilelikeOutputStream(OutputStream):
+    def __init__(self, path):
+        self._fd = open(path, 'ab')
+        self.pos = 0
+
+    def close(self):
+        self.flush()
+        self._fd.close()
+
+    def seek(self, offset):
+        if offset:
+            raise NotImplementedError
+
+    def flush(self):
+        return self._fd.flush()
+
+    def getPos(self):
+        return self.pos
+
+    def writeByte(self, value):
+        self.pos += 1
+        return self._fd.write(value)
+
+    def write(self, value):
+        self.pos += len(value)
+        return self._fd.write(value)
+
 class DataOutputStream(object):
     def __init__(self, output_stream):
         assert isinstance(output_stream, OutputStream)
